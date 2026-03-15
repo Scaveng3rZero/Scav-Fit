@@ -2,148 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Workout Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#121826" />
+  <title>Scav Training Log</title>
   <style>
     :root {
-      --bg: #0b0f14;
-      --panel: #121923;
-      --panel-2: #182231;
-      --line: #273244;
-      --text: #ecf2ff;
-      --muted: #9fb0c7;
-      --accent: #68d391;
-      --accent-2: #63b3ed;
-      --danger: #fc8181;
-      --warning: #f6ad55;
-      --shadow: 0 18px 40px rgba(0,0,0,.28);
-      --radius: 18px;
-      --radius-sm: 12px;
-      --max: 1280px;
+      --bg: #0b1020;
+      --bg-2: #11182c;
+      --panel: rgba(18, 24, 38, 0.92);
+      --panel-2: rgba(27, 36, 58, 0.92);
+      --line: rgba(149, 167, 201, 0.18);
+      --text: #f4f7ff;
+      --muted: #a6b4d3;
+      --soft: #d7e0f5;
+      --accent: #6ee7b7;
+      --accent-2: #60a5fa;
+      --accent-3: #c084fc;
+      --accent-4: #f59e0b;
+      --danger: #fb7185;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.34);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --tap: 50px;
+      --max: 1200px;
     }
 
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
     body {
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(99,179,237,.14), transparent 28%),
-        radial-gradient(circle at top left, rgba(104,211,145,.1), transparent 30%),
-        var(--bg);
-      color: var(--text);
       min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(192,132,252,.18), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(110,231,183,.12), transparent 26%),
+        linear-gradient(180deg, #070b16 0%, #0c1221 45%, #0a1020 100%);
+      padding-bottom: 120px;
     }
 
     .app {
       max-width: var(--max);
       margin: 0 auto;
-      padding: 24px;
+      padding: 14px 14px 28px;
     }
 
-    .hero {
+    .shell {
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 18px;
-      margin-bottom: 20px;
+      gap: 14px;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)), var(--panel);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
     }
 
-    .hero-main,
-    .hero-side,
-    .panel,
-    .exercise-card,
-    .history-item,
-    .summary-card {
-      padding: 20px;
+    .hero {
+      position: relative;
+      padding: 18px;
+      background:
+        radial-gradient(circle at top right, rgba(245,158,11,.18), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(110,231,183,.16), transparent 26%),
+        linear-gradient(135deg, rgba(17,24,44,.96), rgba(28,35,59,.94));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(96,165,250,.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--soft);
+      font-size: .84rem;
+      margin-bottom: 12px;
     }
 
     h1, h2, h3, h4, p { margin-top: 0; }
 
     h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 10px;
-      line-height: 1.05;
+      font-size: clamp(1.9rem, 6vw, 3rem);
+      line-height: 1.02;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
     }
 
     .sub {
       color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 60ch;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      max-width: 58ch;
     }
 
-    .pill-row,
-    .quick-stats {
+    .stats-row,
+    .badge-row,
+    .button-row,
+    .segmented {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .pill,
-    .stat-pill {
-      border: 1px solid var(--line);
-      background: var(--panel-2);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: .92rem;
-    }
-
-    .hero-side {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      justify-content: center;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: .85rem;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 1.6rem;
-      font-weight: 700;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .stack {
-      display: grid;
-      gap: 18px;
-    }
-
-    .panel-title-row {
-      display: flex;
-      justify-content: space-between;
+    .badge,
+    .stat-chip,
+    .tag {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--soft);
+      font-size: .9rem;
     }
 
-    .controls {
+    .quick-grid,
+    .summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      margin-bottom: 18px;
+    }
+
+    .summary-card,
+    .mini-card,
+    .section,
+    .exercise-card,
+    .history-item {
+      padding: 16px;
+    }
+
+    .summary-card,
+    .mini-card {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    }
+
+    .summary-card h4,
+    .mini-card h4 {
+      font-size: .8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+
+    .big {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     label {
       display: block;
-      font-size: .92rem;
       color: var(--muted);
+      font-size: .9rem;
       margin-bottom: 8px;
     }
 
@@ -159,60 +207,106 @@
     input,
     select,
     textarea {
+      min-height: var(--tap);
       border: 1px solid var(--line);
-      background: #0d141d;
+      background: rgba(6, 10, 20, 0.72);
       color: var(--text);
-      padding: 12px 14px;
+      padding: 13px 14px;
+      outline: none;
     }
 
-    textarea { resize: vertical; min-height: 92px; }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(96,165,250,.7);
+      box-shadow: 0 0 0 4px rgba(96,165,250,.14);
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
 
     button {
+      min-height: var(--tap);
       border: 0;
       padding: 12px 16px;
+      font-weight: 800;
       cursor: pointer;
-      font-weight: 700;
-      transition: transform .14s ease, opacity .14s ease;
+      transition: transform .14s ease, opacity .14s ease, filter .14s ease;
     }
 
-    button:hover { transform: translateY(-1px); }
+    button:hover { transform: translateY(-1px); filter: brightness(1.03); }
     button:active { transform: translateY(0); }
 
-    .btn-primary { background: var(--accent); color: #08110b; }
-    .btn-secondary { background: var(--accent-2); color: #08111c; }
-    .btn-muted { background: #202b3c; color: var(--text); }
-    .btn-danger { background: var(--danger); color: #190707; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #34d399);
+      color: #07120d;
+      box-shadow: 0 12px 24px rgba(52,211,153,.24);
+    }
 
-    .button-row {
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--accent-2), #818cf8);
+      color: #08111d;
+      box-shadow: 0 12px 24px rgba(96,165,250,.24);
+    }
+
+    .btn-muted {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #fb7185, #f43f5e);
+      color: #21070c;
+    }
+
+    .segmented {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px;
+    }
+
+    .segmented button {
+      width: auto;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .segmented .active {
+      background: linear-gradient(135deg, rgba(96,165,250,.24), rgba(192,132,252,.18));
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .checkline {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .button-row button { width: auto; }
-
-    .section-note {
-      color: var(--muted);
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
-
-    .routine-group {
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 18px;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
-      background: rgba(255,255,255,.015);
-      margin-bottom: 14px;
+      background: rgba(255,255,255,.04);
+      color: var(--soft);
+      margin-top: 10px;
     }
 
-    .routine-group h3 {
-      margin-bottom: 10px;
-      font-size: 1rem;
+    .checkline input {
+      width: 22px;
+      height: 22px;
+      min-height: auto;
+      accent-color: #34d399;
+      flex: 0 0 auto;
     }
 
-    .routine-group ul {
-      margin: 0;
+    .section ul {
+      margin: 10px 0 0;
       padding-left: 20px;
       color: var(--muted);
       line-height: 1.7;
@@ -220,786 +314,17 @@
 
     .exercise-list {
       display: grid;
-      gap: 14px;
-      margin-top: 10px;
+      gap: 12px;
     }
 
     .exercise-card {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,255,255,.015);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
     }
 
-    .exercise-head {
+    .exercise-top {
       display: flex;
+      align-items: center;
+      gap: 12px;
       justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .exercise-head h3 {
-      margin: 0 0 6px;
-      font-size: 1.05rem;
-    }
-
-    .target {
-      color: var(--muted);
-      font-size: .92rem;
-    }
-
-    .checkbox-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .checkbox-wrap input {
-      width: auto;
-      transform: scale(1.15);
-    }
-
-    .exercise-fields {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .notes-box {
-      margin-top: 10px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .summary-card {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,255,255,.015);
-    }
-
-    .summary-card h4 {
-      color: var(--muted);
-      font-size: .85rem;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-
-    .summary-card .big {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .history-list {
-      display: grid;
-      gap: 12px;
-      max-height: 900px;
-      overflow: auto;
-    }
-
-    .history-item {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,255,255,.015);
-    }
-
-    .history-item h4 {
-      margin-bottom: 6px;
-    }
-
-    .history-meta {
-      color: var(--muted);
-      font-size: .92rem;
-      margin-bottom: 10px;
-    }
-
-    .history-exercises {
-      display: grid;
-      gap: 8px;
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: .8rem;
-      border: 1px solid var(--line);
-      background: var(--panel-2);
-      color: var(--text);
-      margin-right: 8px;
-      margin-top: 6px;
-    }
-
-    .footer-note {
-      text-align: center;
-      color: var(--muted);
-      padding: 20px 0 8px;
-      font-size: .95rem;
-    }
-
-    @media (max-width: 1060px) {
-      .hero,
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .controls {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 720px) {
-      .app { padding: 16px; }
-      .controls,
-      .exercise-fields,
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .exercise-head {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .button-row {
-        flex-direction: column;
-      }
-
-      .button-row button {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app" id="app"></div>
-
-  <script>
-    const WORKOUT_PLAN = {
-      warmup: {
-        title: "Daily Warmup (10–12 minutes)",
-        goal: "Do this every session.",
-        items: [
-          "Jump rope or jumping jacks — 2 minutes",
-          "Arm circles — 20 each",
-          "Hip circles — 20",
-          "Walking lunges — 10 each leg",
-          "Pushups — 15",
-          "Dead hangs from pull-up bar — 30 seconds",
-          "Deep squat hold — 45 seconds"
-        ]
-      },
-      mobilityDaily: {
-        title: "Daily Mobility Routine (10 minutes)",
-        goal: "Night or morning to stay mobile and competitive.",
-        items: [
-          "Deep squat hold — 2 minutes",
-          "Shoulder dislocates — 20",
-          "Hip flexor stretch — 1 min each side",
-          "Hamstring stretch — 1 min each",
-          "Dead hang — 60 seconds"
-        ]
-      },
-      days: {
-        Monday: {
-          title: "Upper Body Strength",
-          goal: "Push + pull strength",
-          finisher: "Pushup ladder — 1–2–3–4–5–6–7–8–9–10 (rest as needed)",
-          exercises: [
-            { name: "Pull-ups", target: "5 sets max reps" },
-            { name: "Dumbbell Floor Press", target: "4 x 10" },
-            { name: "One-arm Dumbbell Rows", target: "4 x 10 each side" },
-            { name: "Pike Pushups", target: "4 x 12" },
-            { name: "Dumbbell Lateral Raises", target: "3 x 15" },
-            { name: "Hanging Knee Raises", target: "4 x 15", section: "Core" },
-            { name: "Pushup Ladder", target: "1–2–3–4–5–6–7–8–9–10", section: "Finisher" }
-          ]
-        },
-        Tuesday: {
-          title: "Lower Body Strength",
-          goal: "Leg strength and joint stability",
-          mobility: [
-            "Couch stretch",
-            "Hip flexor stretch",
-            "Hamstring stretch"
-          ],
-          exercises: [
-            { name: "Goblet Squats", target: "5 x 10" },
-            { name: "Bulgarian Split Squats", target: "4 x 10 each leg" },
-            { name: "Dumbbell Romanian Deadlifts", target: "4 x 12" },
-            { name: "Step-ups", target: "4 x 12 each leg" },
-            { name: "Standing Calf Raises", target: "4 x 20" },
-            { name: "Plank", target: "4 x 60 seconds", section: "Core" }
-          ]
-        },
-        Wednesday: {
-          title: "Pull Strength + Grip",
-          goal: "Military obstacle strength",
-          exercises: [
-            { name: "Pull-ups (variety)", target: "5 sets — wide / neutral / chin-ups" },
-            { name: "Towel Pull-ups", target: "4 sets max" },
-            { name: "Dumbbell Rows", target: "4 x 12" },
-            { name: "Hammer Curls", target: "4 x 12" },
-            { name: "Dead Hangs", target: "4 x 45 seconds", section: "Grip Work" },
-            { name: "Farmer Carries", target: "4 x 1 minute walk", section: "Grip Work" },
-            { name: "Russian Twists", target: "4 x 20", section: "Core" }
-          ]
-        },
-        Thursday: {
-          title: "Athletic Conditioning",
-          goal: "Speed + endurance",
-          circuit: [
-            "20 pushups",
-            "20 air squats",
-            "10 pull-ups",
-            "20 walking lunges",
-            "30-second mountain climbers"
-          ],
-          agility: [
-            "High knees — 1 minute",
-            "Lateral shuffles — 1 minute",
-            "Jump squats — 20"
-          ],
-          mobility: [
-            "Downward dog",
-            "Pigeon stretch",
-            "Deep squat hold"
-          ],
-          exercises: [
-            { name: "Conditioning Circuit", target: "5 rounds" },
-            { name: "Agility Block", target: "3 rounds" },
-            { name: "Yoga Mobility", target: "15 minutes" }
-          ]
-        },
-        Friday: {
-          title: "Full Body Power",
-          goal: "Explosiveness",
-          exercises: [
-            { name: "Dumbbell Thrusters", target: "5 x 10" },
-            { name: "Jump Squats", target: "4 x 12" },
-            { name: "Pull-ups", target: "5 sets" },
-            { name: "Dumbbell Clean + Press", target: "4 x 8" },
-            { name: "Pushups", target: "4 x 25" },
-            { name: "Hanging Leg Raises", target: "4 x 12", section: "Core" }
-          ]
-        },
-        Saturday: {
-          title: "Military Style Conditioning",
-          goal: "Earlier workout. Choose one option.",
-          option1: [
-            "2–4 mile ruck or run",
-            "Every mile stop and do 20 pushups",
-            "20 squats",
-            "10 pull-ups"
-          ],
-          option2: [
-            "AMRAP 40 minutes",
-            "10 pull-ups",
-            "20 pushups",
-            "30 squats",
-            "40 mountain climbers"
-          ],
-          exercises: [
-            { name: "Outdoor Ruck or Run", target: "2–4 miles", section: "Option 1" },
-            { name: "Mile Stop Calisthenics", target: "20 pushups / 20 squats / 10 pull-ups", section: "Option 1" },
-            { name: "Home AMRAP", target: "40 minutes", section: "Option 2" }
-          ]
-        },
-        Sunday: {
-          title: "Rest Day",
-          goal: "Recovery and mobility",
-          exercises: []
-        }
-      }
-    };
-
-    const STORAGE_KEY = "scav_workout_tracker_v1";
-
-    const state = {
-      selectedDate: todayLocal(),
-      logs: loadLogs()
-    };
-
-    function todayLocal() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
-      const local = new Date(now.getTime() - offset * 60000);
-      return local.toISOString().slice(0, 10);
-    }
-
-    function loadLogs() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : {};
-      } catch (err) {
-        console.error("Failed to load logs", err);
-        return {};
-      }
-    }
-
-    function saveLogs() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.logs));
-    }
-
-    function getDayName(dateString) {
-      const date = new Date(dateString + "T12:00:00");
-      return date.toLocaleDateString("en-US", { weekday: "long" });
-    }
-
-    function getCurrentDayPlan() {
-      return WORKOUT_PLAN.days[getDayName(state.selectedDate)] || WORKOUT_PLAN.days.Monday;
-    }
-
-    function defaultExerciseLog(exercise) {
-      return {
-        name: exercise.name,
-        target: exercise.target,
-        completed: false,
-        weight: "",
-        reps: "",
-        sets: "",
-        time: "",
-        distance: "",
-        notes: ""
-      };
-    }
-
-    function buildDefaultEntry(dateString) {
-      const dayName = getDayName(dateString);
-      const plan = WORKOUT_PLAN.days[dayName];
-      return {
-        date: dateString,
-        dayName,
-        dayTitle: plan.title,
-        warmupCompleted: false,
-        mobilityCompleted: false,
-        bodyWeight: "",
-        workoutNotes: "",
-        exercises: (plan.exercises || []).map(defaultExerciseLog)
-      };
-    }
-
-    function getEntry(dateString) {
-      if (!state.logs[dateString]) {
-        state.logs[dateString] = buildDefaultEntry(dateString);
-        saveLogs();
-      }
-      return state.logs[dateString];
-    }
-
-    function syncEntryToDay(dateString) {
-      const dayName = getDayName(dateString);
-      const plan = WORKOUT_PLAN.days[dayName];
-      const existing = state.logs[dateString];
-      if (!existing) {
-        state.logs[dateString] = buildDefaultEntry(dateString);
-        return;
-      }
-
-      const existingByName = Object.fromEntries(existing.exercises.map(ex => [ex.name, ex]));
-      state.logs[dateString] = {
-        ...existing,
-        date: dateString,
-        dayName,
-        dayTitle: plan.title,
-        exercises: (plan.exercises || []).map(ex => ({
-          ...defaultExerciseLog(ex),
-          ...(existingByName[ex.name] || {})
-        }))
-      };
-      saveLogs();
-    }
-
-    function render() {
-      const dayName = getDayName(state.selectedDate);
-      syncEntryToDay(state.selectedDate);
-      const entry = getEntry(state.selectedDate);
-      const plan = getCurrentDayPlan();
-      const logsArray = Object.values(state.logs).sort((a, b) => b.date.localeCompare(a.date));
-      const completedDays = logsArray.filter(item => item.exercises.some(ex => ex.completed) || item.warmupCompleted || item.mobilityCompleted).length;
-      const totalWorkoutsLogged = logsArray.reduce((acc, item) => acc + item.exercises.filter(ex => ex.completed).length, 0);
-      const currentStreak = calculateStreak(logsArray);
-
-      document.getElementById("app").innerHTML = `
-        <section class="hero">
-          <div class="card hero-main">
-            <h1>Workout Tracker</h1>
-            <p class="sub">A GitHub-friendly workout tracking app for your weekly strength, conditioning, mobility, and military-style sessions. Save daily performance, log weight and reps, and track how your numbers improve over time.</p>
-            <div class="pill-row">
-              <span class="pill">Local save</span>
-              <span class="pill">Daily routine view</span>
-              <span class="pill">Progress history</span>
-              <span class="pill">Export JSON backup</span>
-            </div>
-          </div>
-          <div class="card hero-side">
-            <div>
-              <div class="stat-label">Selected training day</div>
-              <div class="stat-value">${dayName}</div>
-              <div class="muted">${plan.title}</div>
-            </div>
-            <div class="quick-stats">
-              <span class="stat-pill">Completed days: ${completedDays}</span>
-              <span class="stat-pill">Exercises logged: ${totalWorkoutsLogged}</span>
-              <span class="stat-pill">Current streak: ${currentStreak}</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="grid">
-          <div class="stack">
-            <div class="card panel">
-              <div class="panel-title-row">
-                <div>
-                  <h2>Daily Log</h2>
-                  <p class="section-note">Pick a date and log what you actually completed. Use weight, reps, sets, time, distance, and notes however you need for each exercise.</p>
-                </div>
-              </div>
-
-              <div class="controls">
-                <div>
-                  <label for="dateInput">Workout date</label>
-                  <input id="dateInput" type="date" value="${state.selectedDate}" />
-                </div>
-                <div>
-                  <label for="dayName">Day</label>
-                  <input id="dayName" type="text" value="${dayName}" disabled />
-                </div>
-                <div>
-                  <label for="dayTitle">Focus</label>
-                  <input id="dayTitle" type="text" value="${plan.title}" disabled />
-                </div>
-                <div>
-                  <label for="bodyWeight">Bodyweight</label>
-                  <input id="bodyWeight" type="text" value="${escapeHtml(entry.bodyWeight || "")}" placeholder="ex: 198 lb" />
-                </div>
-              </div>
-
-              <div class="routine-group">
-                <h3>${WORKOUT_PLAN.warmup.title}</h3>
-                <p class="section-note">${WORKOUT_PLAN.warmup.goal}</p>
-                <ul>${WORKOUT_PLAN.warmup.items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-                <div class="button-row">
-                  <button class="btn-muted" id="warmupToggle">${entry.warmupCompleted ? "Warmup completed ✓" : "Mark warmup complete"}</button>
-                </div>
-              </div>
-
-              <div class="routine-group">
-                <h3>${dayName} — ${plan.title}</h3>
-                <p class="section-note"><strong>Goal:</strong> ${plan.goal}</p>
-                ${renderPlanExtras(plan)}
-              </div>
-
-              ${plan.exercises.length ? `
-                <div class="exercise-list">
-                  ${entry.exercises.map((exercise, index) => `
-                    <article class="exercise-card">
-                      <div class="exercise-head">
-                        <div>
-                          <h3>${escapeHtml(exercise.name)}</h3>
-                          <div class="target">Target: ${escapeHtml(exercise.target || "")}</div>
-                          ${plan.exercises[index]?.section ? `<span class="tag">${escapeHtml(plan.exercises[index].section)}</span>` : ""}
-                        </div>
-                        <label class="checkbox-wrap">
-                          <input type="checkbox" data-action="toggle-complete" data-index="${index}" ${exercise.completed ? "checked" : ""} />
-                          Completed
-                        </label>
-                      </div>
-
-                      <div class="exercise-fields">
-                        <div>
-                          <label>Weight</label>
-                          <input type="text" data-field="weight" data-index="${index}" value="${escapeHtml(exercise.weight || "")}" placeholder="40 lb" />
-                        </div>
-                        <div>
-                          <label>Reps</label>
-                          <input type="text" data-field="reps" data-index="${index}" value="${escapeHtml(exercise.reps || "")}" placeholder="10,10,8,8" />
-                        </div>
-                        <div>
-                          <label>Sets</label>
-                          <input type="text" data-field="sets" data-index="${index}" value="${escapeHtml(exercise.sets || "")}" placeholder="4" />
-                        </div>
-                        <div>
-                          <label>Time</label>
-                          <input type="text" data-field="time" data-index="${index}" value="${escapeHtml(exercise.time || "")}" placeholder="60 sec / 40 min" />
-                        </div>
-                        <div>
-                          <label>Distance</label>
-                          <input type="text" data-field="distance" data-index="${index}" value="${escapeHtml(exercise.distance || "")}" placeholder="2 miles" />
-                        </div>
-                      </div>
-
-                      <div class="notes-box">
-                        <label>Notes</label>
-                        <textarea data-field="notes" data-index="${index}" placeholder="How did it feel? Any PR, regression, pain, grip issues, pace notes, etc.">${escapeHtml(exercise.notes || "")}</textarea>
-                      </div>
-                    </article>
-                  `).join("")}
-                </div>
-              ` : `<p class="muted">Rest day. Use today for recovery, mobility, and prep for the next week.</p>`}
-
-              <div class="routine-group">
-                <h3>${WORKOUT_PLAN.mobilityDaily.title}</h3>
-                <p class="section-note">${WORKOUT_PLAN.mobilityDaily.goal}</p>
-                <ul>${WORKOUT_PLAN.mobilityDaily.items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-                <div class="button-row">
-                  <button class="btn-muted" id="mobilityToggle">${entry.mobilityCompleted ? "Mobility completed ✓" : "Mark mobility complete"}</button>
-                </div>
-              </div>
-
-              <div>
-                <label for="workoutNotes">Daily notes</label>
-                <textarea id="workoutNotes" placeholder="General notes for the day — energy, soreness, sleep, modifications, weather, run pace, ruck weight, etc.">${escapeHtml(entry.workoutNotes || "")}</textarea>
-              </div>
-
-              <div class="button-row">
-                <button class="btn-primary" id="saveBtn">Save workout</button>
-                <button class="btn-secondary" id="exportBtn">Export backup</button>
-                <button class="btn-muted" id="importBtn">Import backup</button>
-                <button class="btn-danger" id="clearDayBtn">Clear this day</button>
-              </div>
-              <input id="importFile" type="file" accept="application/json" hidden />
-            </div>
-          </div>
-
-          <div class="stack">
-            <div class="card panel">
-              <div class="panel-title-row">
-                <div>
-                  <h2>Progress Snapshot</h2>
-                  <p class="section-note">A quick view of your consistency and log volume.</p>
-                </div>
-              </div>
-
-              <div class="summary-grid">
-                <div class="summary-card">
-                  <h4>Completed days</h4>
-                  <div class="big">${completedDays}</div>
-                </div>
-                <div class="summary-card">
-                  <h4>Workout streak</h4>
-                  <div class="big">${currentStreak}</div>
-                </div>
-                <div class="summary-card">
-                  <h4>Logs stored</h4>
-                  <div class="big">${logsArray.length}</div>
-                </div>
-                <div class="summary-card">
-                  <h4>Exercises completed</h4>
-                  <div class="big">${totalWorkoutsLogged}</div>
-                </div>
-              </div>
-
-              <p class="muted">Data is stored in your browser using localStorage. Export a JSON backup before switching devices or browsers.</p>
-            </div>
-
-            <div class="card panel">
-              <div class="panel-title-row">
-                <div>
-                  <h2>History</h2>
-                  <p class="section-note">Your recent saved workout logs.</p>
-                </div>
-              </div>
-
-              <div class="history-list">
-                ${logsArray.length ? logsArray.map(item => `
-                  <article class="history-item">
-                    <h4>${escapeHtml(item.date)} — ${escapeHtml(item.dayName)} (${escapeHtml(item.dayTitle)})</h4>
-                    <div class="history-meta">
-                      Warmup: ${item.warmupCompleted ? "Yes" : "No"} · Mobility: ${item.mobilityCompleted ? "Yes" : "No"} · Bodyweight: ${escapeHtml(item.bodyWeight || "—")}
-                    </div>
-                    <div class="history-exercises">
-                      ${item.exercises && item.exercises.length
-                        ? item.exercises
-                            .filter(ex => ex.completed || ex.weight || ex.reps || ex.sets || ex.time || ex.distance || ex.notes)
-                            .map(ex => `<div><strong>${escapeHtml(ex.name)}:</strong> ${formatExerciseSummary(ex)}</div>`)
-                            .join("") || `<div>No exercise details saved.</div>`
-                        : `<div>Rest / recovery day.</div>`}
-                    </div>
-                    ${item.workoutNotes ? `<p class="muted" style="margin-top:12px;"><strong>Notes:</strong> ${escapeHtml(item.workoutNotes)}</p>` : ""}
-                  </article>
-                `).join("") : `<p class="muted">No workout history yet. Save your first training day to start building it.</p>`}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <p class="footer-note">Built for GitHub Pages. One file, no framework required.</p>
-      `;
-
-      bindEvents();
-    }
-
-    function renderPlanExtras(plan) {
-      let html = "";
-      if (plan.circuit) {
-        html += `<h4>Circuit</h4><ul>${plan.circuit.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul><p class="muted">Rest 2 minutes between rounds.</p>`;
-      }
-      if (plan.agility) {
-        html += `<h4>Agility</h4><ul>${plan.agility.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-      }
-      if (plan.option1) {
-        html += `<h4>Option 1</h4><ul>${plan.option1.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-      }
-      if (plan.option2) {
-        html += `<h4>Option 2</h4><ul>${plan.option2.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-      }
-      if (plan.mobility) {
-        html += `<h4>Mobility</h4><ul>${plan.mobility.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-      }
-      if (plan.finisher) {
-        html += `<h4>Finisher</h4><ul><li>${escapeHtml(plan.finisher)}</li></ul>`;
-      }
-      return html;
-    }
-
-    function formatExerciseSummary(ex) {
-      const parts = [];
-      if (ex.completed) parts.push("completed");
-      if (ex.weight) parts.push(`weight: ${escapeHtml(ex.weight)}`);
-      if (ex.reps) parts.push(`reps: ${escapeHtml(ex.reps)}`);
-      if (ex.sets) parts.push(`sets: ${escapeHtml(ex.sets)}`);
-      if (ex.time) parts.push(`time: ${escapeHtml(ex.time)}`);
-      if (ex.distance) parts.push(`distance: ${escapeHtml(ex.distance)}`);
-      if (ex.notes) parts.push(`notes: ${escapeHtml(ex.notes)}`);
-      return parts.length ? parts.join(" · ") : "No details";
-    }
-
-    function calculateStreak(logsArray) {
-      const loggedDates = new Set(
-        logsArray
-          .filter(item => item.exercises.some(ex => ex.completed) || item.warmupCompleted || item.mobilityCompleted)
-          .map(item => item.date)
-      );
-
-      let streak = 0;
-      const cursor = new Date(todayLocal() + "T12:00:00");
-
-      for (let i = 0; i < 365; i++) {
-        const dateString = cursor.toISOString().slice(0, 10);
-        if (loggedDates.has(dateString)) {
-          streak++;
-          cursor.setDate(cursor.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-      return streak;
-    }
-
-    function bindEvents() {
-      document.getElementById("dateInput").addEventListener("change", (e) => {
-        state.selectedDate = e.target.value;
-        render();
-      });
-
-      document.getElementById("bodyWeight").addEventListener("input", (e) => {
-        getEntry(state.selectedDate).bodyWeight = e.target.value;
-      });
-
-      document.getElementById("workoutNotes").addEventListener("input", (e) => {
-        getEntry(state.selectedDate).workoutNotes = e.target.value;
-      });
-
-      document.getElementById("warmupToggle").addEventListener("click", () => {
-        const entry = getEntry(state.selectedDate);
-        entry.warmupCompleted = !entry.warmupCompleted;
-        saveLogs();
-        render();
-      });
-
-      document.getElementById("mobilityToggle").addEventListener("click", () => {
-        const entry = getEntry(state.selectedDate);
-        entry.mobilityCompleted = !entry.mobilityCompleted;
-        saveLogs();
-        render();
-      });
-
-      document.querySelectorAll("[data-action='toggle-complete']").forEach(input => {
-        input.addEventListener("change", (e) => {
-          const index = Number(e.target.dataset.index);
-          getEntry(state.selectedDate).exercises[index].completed = e.target.checked;
-        });
-      });
-
-      document.querySelectorAll("[data-field]").forEach(field => {
-        field.addEventListener("input", (e) => {
-          const index = Number(e.target.dataset.index);
-          const key = e.target.dataset.field;
-          getEntry(state.selectedDate).exercises[index][key] = e.target.value;
-        });
-      });
-
-      document.getElementById("saveBtn").addEventListener("click", () => {
-        saveLogs();
-        alert("Workout saved.");
-        render();
-      });
-
-      document.getElementById("clearDayBtn").addEventListener("click", () => {
-        const confirmed = confirm("Clear the saved log for this selected day?");
-        if (!confirmed) return;
-        state.logs[state.selectedDate] = buildDefaultEntry(state.selectedDate);
-        saveLogs();
-        render();
-      });
-
-      document.getElementById("exportBtn").addEventListener("click", () => {
-        const blob = new Blob([JSON.stringify(state.logs, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "workout-tracker-backup.json";
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-
-      const importFile = document.getElementById("importFile");
-      document.getElementById("importBtn").addEventListener("click", () => importFile.click());
-      importFile.addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid JSON structure");
-          state.logs = data;
-          saveLogs();
-          render();
-          alert("Backup imported.");
-        } catch (err) {
-          alert("Import failed. Please use a valid workout tracker backup file.");
-          console.error(err);
-        } finally {
-          e.target.value = "";
-        }
-      });
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    render();
-  </script>
-</body>
-</html>
