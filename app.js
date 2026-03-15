@@ -387,29 +387,34 @@ function render() {
             </div>
 
             <div class="form-grid">
-              <div>
-                <label for="dateInput">Workout date</label>
-                <input id="dateInput" type="date" value="${state.selectedDate}" />
-              </div>
-              <div>
-                <label for="bodyWeight">Bodyweight</label>
-                <input id="bodyWeight" type="text" value="${escapeHtml(entry.bodyWeight)}" placeholder="198 lb" />
-              </div>
-            </div>
+  <div>
+    <label for="dateInput">Workout date</label>
+    <input id="dateInput" type="date" value="${state.selectedDate}" />
+  </div>
+  <div>
+    <label for="bodyWeight">Bodyweight</label>
+    <input id="bodyWeight" type="text" value="${escapeHtml(entry.bodyWeight)}" placeholder="198 lb" />
+  </div>
+</div>
 
-            <div class="checkline">
-              <input id="warmupCheck" type="checkbox" ${entry.warmupCompleted ? "checked" : ""} />
-              <div>
-                <strong>${WORKOUT_PLAN.warmup.title}</strong>
-                <div class="muted">${WORKOUT_PLAN.warmup.goal}</div>
-              </div>
-            </div>
+<div class="checkline">
+  <input id="warmupCheck" type="checkbox" ${entry.warmupCompleted ? "checked" : ""} />
+  <div>
+    <strong>${WORKOUT_PLAN.warmup.title}</strong>
+    <div class="muted">${WORKOUT_PLAN.warmup.goal}</div>
+  </div>
+</div>
+<ul>
+  ${WORKOUT_PLAN.warmup.items
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("")}
+</ul>
 
-            <div class="section" style="padding:14px 0 0;">
-              <h3>${escapeHtml(entry.dayName)} — ${escapeHtml(plan.title)}</h3>
-              <p class="muted"><strong>Goal:</strong> ${escapeHtml(plan.goal)}</p>
-              ${renderPlanExtras(plan)}
-            </div>
+<div class="section" style="padding:14px 0 0;">
+  <h3>${escapeHtml(entry.dayName)} — ${escapeHtml(plan.title)}</h3>
+  <p class="muted"><strong>Goal:</strong> ${escapeHtml(plan.goal)}</p>
+  ${renderPlanExtras(plan)}
+</div>
           </div>
         </section>
 
