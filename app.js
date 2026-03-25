@@ -152,5 +152,79 @@ const WORKOUT_PLAN = {
       ]
     }
 
+function renderDay(dayData) {
+  let html = `<h2>${dayData.title}</h2><p>${dayData.goal}</p>`;
+
+  if (dayData.exercises) {
+    html += `
+      <h3>Exercises</h3>
+      <ul>
+        ${dayData.exercises.map(ex => `<li>${ex.name} — ${ex.target}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  if (dayData.power) {
+    html += `
+      <h3>Power</h3>
+      <ul>
+        ${dayData.power.map(ex => `<li>${ex.name} — ${ex.target}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  if (dayData.finisher) {
+    html += `
+      <h3>Finisher</h3>
+      <ul>
+        ${dayData.finisher.map(item => `<li>${item}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  if (dayData.core) {
+    html += `
+      <h3>Core</h3>
+      <ul>
+        ${dayData.core.map(item => `<li>${item}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  if (dayData.mobility) {
+    html += `
+      <h3>Mobility</h3>
+      <ul>
+        ${dayData.mobility.map(item => `<li>${item}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  if (dayData.options) {
+    html += `
+      <h3>Options</h3>
+      ${dayData.options.map(opt => `
+        <div>
+          <strong>${opt.name}</strong>
+          <ul>
+            ${opt.plan.map(step => `<li>${step}</li>`).join("")}
+          </ul>
+        </div>
+      `).join("")}
+    `;
+  }
+
+  if (dayData.notes) {
+    html += `
+      <h3>Notes</h3>
+      <ul>
+        ${dayData.notes.map(note => `<li>${note}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  return html;
+}
+    
   }
 };
