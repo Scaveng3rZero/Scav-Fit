@@ -26,7 +26,6 @@ const WORKOUT_PLAN = {
   },
 
   days: {
-
     Monday: {
       title: "Upper Push + Conditioning",
       goal: "Chest, triceps, push endurance",
@@ -151,80 +150,134 @@ const WORKOUT_PLAN = {
         "Stretching recommended"
       ]
     }
-
-function renderDay(dayData) {
-  let html = `<h2>${dayData.title}</h2><p>${dayData.goal}</p>`;
-
-  if (dayData.exercises) {
-    html += `
-      <h3>Exercises</h3>
-      <ul>
-        ${dayData.exercises.map(ex => `<li>${ex.name} — ${ex.target}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  if (dayData.power) {
-    html += `
-      <h3>Power</h3>
-      <ul>
-        ${dayData.power.map(ex => `<li>${ex.name} — ${ex.target}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  if (dayData.finisher) {
-    html += `
-      <h3>Finisher</h3>
-      <ul>
-        ${dayData.finisher.map(item => `<li>${item}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  if (dayData.core) {
-    html += `
-      <h3>Core</h3>
-      <ul>
-        ${dayData.core.map(item => `<li>${item}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  if (dayData.mobility) {
-    html += `
-      <h3>Mobility</h3>
-      <ul>
-        ${dayData.mobility.map(item => `<li>${item}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  if (dayData.options) {
-    html += `
-      <h3>Options</h3>
-      ${dayData.options.map(opt => `
-        <div>
-          <strong>${opt.name}</strong>
-          <ul>
-            ${opt.plan.map(step => `<li>${step}</li>`).join("")}
-          </ul>
-        </div>
-      `).join("")}
-    `;
-  }
-
-  if (dayData.notes) {
-    html += `
-      <h3>Notes</h3>
-      <ul>
-        ${dayData.notes.map(note => `<li>${note}</li>`).join("")}
-      </ul>
-    `;
-  }
-
-  return html;
-}
-    
   }
 };
+
+const app = document.getElementById("app");
+const dayNames = Object.keys(WORKOUT_PLAN.days);
+
+function createList(items) {
+  return `
+    <ul class="clean-list">
+      ${items.map(item => `<li>${item}</li>`).join("")}
+    </ul>
+  `;
+}
+
+function createExerciseList(exercises) {
+  return `
+    <ul class="clean-list">
+      ${exercises.map(ex => `
+        <li>
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-target">${ex.target}</div>
+        </li>
+      `).join("")}
+    </ul>
+  `;
+}
+
+function createOptions(options) {
+  return options.map(option => `
+    <div class="option-block">
+      <h4>${option.name}</h4>
+      ${createList(option.plan)}
+    </div>
+  `).join("");
+}
+
+function createSectionCard(title, content) {
+  return `
+    <section class="section-card">
+      <h3 class="section-title">${title}</h3>
+      ${content}
+    </section>
+  `;
+}
+
+function renderDay(dayName) {
+  const day = WORKOUT_PLAN.days[dayName];
+  const sectionCards = [];
+
+  if (day.exercises?.length) {
+    sectionCards.push(createSectionCard("Exercises", createExerciseList(day.exercises)));
+  }
+
+  if (day.power?.length) {
+    sectionCards.push(createSectionCard("Power", createExerciseList(day.power)));
+  }
+
+  if (day.finisher?.length) {
+    sectionCards.push(createSectionCard("Finisher", createList(day.finisher)));
+  }
+
+  if (day.core?.length) {
+    sectionCards.push(createSectionCard("Core", createList(day.core)));
+  }
+
+  if (day.mobility?.length) {
+    sectionCards.push(createSectionCard("Mobility", createList(day.mobility)));
+  }
+
+  if (day.options?.length) {
+    sectionCards.push(createSectionCard("Options", createOptions(day.options)));
+  }
+
+  if (day.notes?.length) {
+    sectionCards.push(createSectionCard("Notes", createList(day.notes)));
+  }
+
+  return `
+    <section class="card">
+      <h2>${dayName} — ${day.title}</h2>
+      <p class="goal">${day.goal}</p>
+
+      <div class="badge-row">
+        <span class="badge">Warmup Included</span>
+        <span class="badge">Mobility Included</span>
+      </div>
+    </section>
+
+    <div class="mini-grid">
+      ${sectionCards.length ? sectionCards.join("") : `<p class="empty">No workout details found.</p>`}
+    </div>
+  `;
+}
+
+function renderApp(selectedDay = dayNames[0]) {
+  app.innerHTML = `
+    <section class="controls">
+      <div class="control-group">
+        <label for="daySelect">Choose a training day</label>
+        <select id="daySelect">
+          ${dayNames.map(day => `
+            <option value="${day}" ${day === selectedDay ? "selected" : ""}>${day}</option>
+          `).join("")}
+        </select>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>${WORKOUT_PLAN.warmup.title}</h2>
+        <p class="goal">${WORKOUT_PLAN.warmup.goal}</p>
+        ${createList(WORKOUT_PLAN.warmup.items)}
+      </section>
+
+      <section class="card">
+        <h2>${WORKOUT_PLAN.mobilityDaily.title}</h2>
+        <p class="goal">${WORKOUT_PLAN.mobilityDaily.goal}</p>
+        ${createList(WORKOUT_PLAN.mobilityDaily.items)}
+      </section>
+
+      ${renderDay(selectedDay)}
+    </div>
+  `;
+
+  const daySelect = document.getElementById("daySelect");
+  daySelect.addEventListener("change", (event) => {
+    renderApp(event.target.value);
+  });
+}
+
+renderApp();
