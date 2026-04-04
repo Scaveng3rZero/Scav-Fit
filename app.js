@@ -156,13 +156,15 @@ const STORAGE_KEYS = {
   progress: "scavTrainingProgress",
   streak: "scavTrainingStreak",
   lastCompleteDate: "scavTrainingLastCompleteDate",
-  workoutMode: "scavTrainingWorkoutMode"
+  workoutMode: "scavTrainingWorkoutMode",
+  notes: "scavTrainingNotes"
 };
 
 const app = document.getElementById("app");
 const dayNames = Object.keys(WORKOUT_PLAN.days);
 const todayName = dayNames[new Date().getDay()];
 let timerInterval = null;
+let noteSaveTimeout = null;
 
 function getTodayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -228,6 +230,35 @@ function getLastCompleteDate() {
 
 function setLastCompleteDate(value) {
   localStorage.setItem(STORAGE_KEYS.lastCompleteDate, value);
+}
+
+function getNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.notes)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function setNotes(notes) {
+  localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(notes));
+}
+
+function getDayNote(dayName) {
+  const notes = getNotes();
+  return notes[dayName] || "";
+}
+
+function setDayNote(dayName, value) {
+  const notes = getNotes();
+  notes[dayName] = value;
+  setNotes(notes);
+}
+
+function clearDayNote(dayName) {
+  const notes = getNotes();
+  delete notes[dayName];
+  setNotes(notes);
 }
 
 function updateHeaderStats() {
@@ -337,6 +368,9 @@ function getDayItemCounts(dayName) {
   const progress = getDayProgress(dayName);
 
   const sections = [
+    ["warmup", WORKOUT_PLAN.warmup.items],
+    ["mobilityDaily", WORKOUT_PLAN.mobilityDaily.items],
+    ["progression", WORKOUT_PLAN.progression.items],
     ["exercises", day.exercises],
     ["conditioning", day.conditioning],
     ["core", day.core],
@@ -435,6 +469,24 @@ function createTimerCard() {
         </div>
 
         <div id="timerStatus" class="timer-status">Ready</div>
+      </div>
+    </section>
+  `;
+}
+
+function createNotesCard(dayName) {
+  const noteValue = getDayNote(dayName);
+
+  return `
+    <section class="card">
+      <h2>Training Notes</h2>
+      <p class="goal">Log reps, run times, failures, soreness, or anything worth tracking for ${escapeHtml(dayName)}</p>
+
+      <div class="control-group">
+        <label for="dayNotes">Notes for ${escapeHtml(dayName)}</label>
+        <textarea id="dayNotes" placeholder="Example: Pull-ups felt strong. Hit 5,4,4,3,3. 2-mile pace felt rough in the last half mile.">${escapeHtml(noteValue)}</textarea>
+        <div class="notes-help">Saved automatically while you type.</div>
+        <div id="notesStatus" class="notes-status">Ready</div>
       </div>
     </section>
   `;
@@ -548,7 +600,7 @@ function renderApp(selectedDay = todayName) {
       </div>
 
       ${createTimerCard()}
-
+      ${createNotesCard(selectedDay)}
       ${renderDay(selectedDay)}
     </div>
   `;
@@ -563,6 +615,8 @@ function wireEvents(selectedDay) {
   const todayBtn = document.getElementById("todayBtn");
   const toggleWorkoutModeBtn = document.getElementById("toggleWorkoutModeBtn");
   const resetDayBtn = document.getElementById("resetDayBtn");
+  const dayNotes = document.getElementById("dayNotes");
+  const notesStatus = document.getElementById("notesStatus");
 
   daySelect?.addEventListener("change", (event) => {
     renderApp(event.target.value);
@@ -579,6 +633,7 @@ function wireEvents(selectedDay) {
 
   resetDayBtn?.addEventListener("click", () => {
     clearDayProgress(selectedDay);
+    clearDayNote(selectedDay);
     renderApp(selectedDay);
   });
 
@@ -594,6 +649,30 @@ function wireEvents(selectedDay) {
       renderApp(dayName);
     });
   });
+
+  if (dayNotes) {
+    dayNotes.addEventListener("input", (event) => {
+      const value = event.target.value;
+
+      if (noteSaveTimeout) {
+        clearTimeout(noteSaveTimeout);
+      }
+
+      if (notesStatus) {
+        notesStatus.textContent = "Saving...";
+        notesStatus.classList.remove("saved");
+      }
+
+      noteSaveTimeout = window.setTimeout(() => {
+        setDayNote(selectedDay, value);
+
+        if (notesStatus) {
+          notesStatus.textContent = "Saved";
+          notesStatus.classList.add("saved");
+        }
+      }, 250);
+    });
+  }
 
   document.querySelectorAll("[data-timer]").forEach((button) => {
     button.addEventListener("click", () => {
