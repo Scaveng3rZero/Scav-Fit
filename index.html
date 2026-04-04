@@ -10,12 +10,26 @@
   <title>Scav Training Log</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <div class="app">
     <header class="site-header">
-      <h1>Scav Training Log</h1>
-      <p class="subtitle">Bodyweight ACFT + Mobility + Strength Plan</p>
+      <div class="header-top">
+        <div>
+          <h1>Scav Training Log</h1>
+          <p class="subtitle">Bodyweight ACFT + Mobility + Strength Plan</p>
+        </div>
+
+        <div class="header-stats">
+          <div class="stat-pill">
+            <span class="stat-label">Today</span>
+            <span id="todayLabel" class="stat-value">--</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Streak</span>
+            <span id="streakValue" class="stat-value">0 days</span>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main id="app"></main>
