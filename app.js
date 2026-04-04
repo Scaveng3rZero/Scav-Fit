@@ -432,10 +432,16 @@ function createProgressMarkup(dayName) {
   const { total, completed } = getDayItemCounts(dayName);
   const percent = total ? Math.round((completed / total) * 100) : 0;
 
+  let statusText = "Locked in";
+  if (percent === 0) statusText = "Ready to train";
+  else if (percent < 50) statusText = "In progress";
+  else if (percent < 100) statusText = "Closing in";
+  else statusText = "Complete";
+
   return `
     <div class="progress-wrap">
       <div class="progress-meta">
-        <span>Daily completion</span>
+        <span>${statusText}</span>
         <span>${completed}/${total} complete</span>
       </div>
       <div class="progress-bar" aria-hidden="true">
