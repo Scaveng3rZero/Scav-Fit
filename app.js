@@ -1,17 +1,16 @@
 const WORKOUT_PLAN = {
   warmup: {
-    title: "Daily Warmup",
-    goal: "10–12 minutes before every session",
-    items: [
-      "Jumping jacks — 2 minutes",
-      "Arm circles — 20 each direction",
-      "Hip circles — 20",
-      "Walking lunges — 10 each leg",
-      "Push-ups — 15",
-      "Dead hang — 30 seconds",
-      "Deep squat hold — 45 seconds"
-    ]
-  },
+  title: "Daily Warmup",
+  goal: "10–12 minutes before every session",
+  items: [
+    "Jumping jacks — 1 minute",
+    "Arm circles — 10 each direction",
+    "Standing lunges — 10 each leg",
+    "Push-ups — 15",
+    "Dead hang — 30 seconds",
+    "Deep squat hold — 1 minute"
+  ]
+},
 
   mobilityDaily: {
     title: "Daily Mobility",
@@ -370,7 +369,6 @@ function getDayItemCounts(dayName) {
   const sections = [
     ["warmup", WORKOUT_PLAN.warmup.items],
     ["mobilityDaily", WORKOUT_PLAN.mobilityDaily.items],
-    ["progression", WORKOUT_PLAN.progression.items],
     ["exercises", day.exercises],
     ["conditioning", day.conditioning],
     ["core", day.core],
@@ -599,10 +597,14 @@ function renderApp(selectedDay = todayName) {
         </section>
 
         <section class="card">
-          <h2>${escapeHtml(WORKOUT_PLAN.progression.title)}</h2>
-          <p class="goal">${escapeHtml(WORKOUT_PLAN.progression.goal)}</p>
-          ${createList(WORKOUT_PLAN.progression.items, selectedDay, "progression")}
-        </section>
+  <h2>${escapeHtml(WORKOUT_PLAN.progression.title)}</h2>
+  <p class="goal">${escapeHtml(WORKOUT_PLAN.progression.goal)}</p>
+  <ul class="clean-list">
+    ${WORKOUT_PLAN.progression.items.map(item => `
+      <li>${escapeHtml(item)}</li>
+    `).join("")}
+  </ul>
+</section>
       </div>
 
       ${createTimerCard()}
