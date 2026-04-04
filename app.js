@@ -3,11 +3,11 @@ const WORKOUT_PLAN = {
     title: "Daily Warmup",
     goal: "10–12 minutes before every session",
     items: [
-      "Jump rope or jumping jacks — 2 minutes",
+      "Jumping jacks — 2 minutes",
       "Arm circles — 20 each direction",
       "Hip circles — 20",
       "Walking lunges — 10 each leg",
-      "Pushups — 15",
+      "Push-ups — 15",
       "Dead hang — 30 seconds",
       "Deep squat hold — 45 seconds"
     ]
@@ -18,136 +18,135 @@ const WORKOUT_PLAN = {
     goal: "10 minutes morning or night",
     items: [
       "Deep squat hold — 2 minutes",
-      "Shoulder dislocates — 20",
-      "Hip flexor stretch — 1 min each side",
-      "Hamstring stretch — 1 min each",
+      "Hip flexor stretch — 1 minute each side",
+      "Hamstring stretch — 1 minute each side",
+      "World's Greatest Stretch — 5 reps each side",
       "Dead hang — 60 seconds"
     ]
   },
 
+  progression: {
+    title: "Progression Rules",
+    goal: "Improve weekly without weights",
+    items: [
+      "Add 1 rep per set each week when possible",
+      "Or add 1 set to a main movement",
+      "Or add 5–10 seconds to holds and planks",
+      "Focus on clean reps before adding volume",
+      "If pull-ups are lagging, practice submax sets more often"
+    ]
+  },
+
   days: {
-    Monday: {
-      title: "Upper Push + Conditioning",
-      goal: "Chest, triceps, push endurance",
+    Sunday: {
+      title: "Lower Body Power + Sprints",
+      goal: "Build explosive leg strength, sprint speed, and ACFT carryover",
       exercises: [
-        { name: "DB Bench Press", target: "4 sets (15-12-10-8)" },
-        { name: "Incline DB Press", target: "3 sets" },
-        { name: "DB Fly → Press", target: "3 supersets" },
-        { name: "Overhead Tricep Extension", target: "3 sets" },
-        { name: "Bench Dips", target: "2 sets to failure" },
-        { name: "Push-ups", target: "2 max sets" }
+        { name: "Jump Squats", target: "5 sets of 5 reps" },
+        { name: "Broad Jumps", target: "5 sets of 3 reps" },
+        { name: "Walking Lunges", target: "4 sets of 20 steps" },
+        { name: "Single-Leg Step-Back Squats", target: "3 sets of 10 each leg" }
       ],
-      finisher: [
-        "5 rounds:",
-        "20 push-ups",
-        "30 sec plank"
+      conditioning: [
+        "Hill sprints or flat sprints — 8 rounds of 20–30 seconds",
+        "Walk back or rest 60–90 seconds between rounds"
+      ]
+    },
+
+    Monday: {
+      title: "Push + Core",
+      goal: "Improve push-up score, upper-body endurance, and trunk stability",
+      exercises: [
+        { name: "Hand-Release Push-Ups", target: "5 sets near max reps" },
+        { name: "Decline Push-Ups", target: "4 sets of 12–15 reps" },
+        { name: "Diamond Push-Ups", target: "3 sets of 10 reps" }
+      ],
+      core: [
+        "Plank — 3 max-time sets",
+        "Mountain climbers — 3 sets of 40 total",
+        "Hollow hold — 3 sets of 20–30 seconds"
       ]
     },
 
     Tuesday: {
-      title: "Upper Pull + Core",
-      goal: "Back, biceps, grip strength",
+      title: "Pull + Grip",
+      goal: "Build back strength, grip, hanging control, and pull-up performance",
       exercises: [
-        { name: "Pull-ups", target: "4 sets max reps" },
-        { name: "DB Rows", target: "4 sets" },
-        { name: "Romanian Deadlift", target: "3 sets" },
-        { name: "Hammer Curls", target: "3 sets" },
-        { name: "Dead Hang", target: "3 sets max time" }
+        { name: "Pull-Ups", target: "5 sets max quality reps" },
+        { name: "Chin-Ups", target: "3 sets max reps" },
+        { name: "Negative Pull-Ups", target: "3 sets of 5 with 5-second lowers" },
+        { name: "Dead Hang", target: "4 sets max time" }
       ],
       core: [
-        "3 rounds:",
-        "Hanging knee raises x15",
-        "Plank x45 sec",
-        "Russian twists x20"
+        "Hanging knee raises — 3 sets of 12",
+        "Plank — 3 sets of 45–60 seconds"
       ]
     },
 
     Wednesday: {
-      title: "Conditioning + Mobility",
-      goal: "Recovery + endurance",
+      title: "Conditioning + Run Focus",
+      goal: "Improve work capacity, agility, and 2-mile run performance",
       exercises: [
-        { name: "Steady Cardio", target: "20–30 minutes (run, bike, ruck)" }
+        { name: "Shuttle Runs", target: "6 rounds of 25m down and back" },
+        { name: "Burpees", target: "5 sets of 15 reps" },
+        { name: "High Knees", target: "3 rounds of 45 seconds" },
+        { name: "Steady Run", target: "1.5 to 2 miles" }
       ],
       mobility: [
-        "Hip mobility work",
-        "Hamstring stretching",
-        "Shoulder mobility"
+        "Light hip mobility after run",
+        "Hamstring stretch",
+        "Calf stretch"
       ]
     },
 
     Thursday: {
-      title: "Legs + Explosive Power",
-      goal: "Lower body strength + athleticism",
-      exercises: [
-        { name: "Goblet Squats", target: "4 sets" },
-        { name: "Bulgarian Split Squats", target: "3 sets each leg" },
-        { name: "DB Deadlifts", target: "3 sets" },
-        { name: "Walking Lunges", target: "2 sets" }
+      title: "Mobility + Core Recovery",
+      goal: "Improve range of motion, recovery, posture, and core endurance",
+      mobility: [
+        "Deep squat hold — 3 minutes total",
+        "Hip flexor stretch — 2 minutes each side",
+        "World's Greatest Stretch — 2 rounds each side",
+        "Dead hang — 3 rounds"
       ],
-      power: [
-        { name: "Jump Squats", target: "3x10" },
-        { name: "Explosive Step-ups", target: "3x10 each leg" }
-      ],
-      finisher: [
-        "5 rounds:",
-        "10 lunges each leg",
-        "10 squats",
-        "30 sec wall sit"
+      core: [
+        "Slow sit-ups — 3 sets of 15",
+        "Hollow hold — 3 sets of 20–30 seconds",
+        "Plank — 2 max-time sets"
       ]
     },
 
     Friday: {
-      title: "Shoulders + Arms",
-      goal: "Hypertrophy + weak point focus",
-      exercises: [
-        { name: "Shoulder Press", target: "4 sets" },
-        { name: "Lateral Raises", target: "3 sets" },
-        { name: "Rear Delt Raises", target: "3 sets" },
-        { name: "Bicep Curls", target: "3 sets" },
-        { name: "Tricep Extensions", target: "3 sets" }
-      ],
-      finisher: [
-        "Push-ups — 1 max set",
-        "Pull-ups — 1 max set"
-      ]
-    },
-
-    Saturday: {
-      title: "Military Conditioning",
-      goal: "Endurance + full-body performance",
+      title: "Full Body Combat Circuit",
+      goal: "Train full-body endurance and performance under fatigue",
       options: [
         {
-          name: "Run + Circuit",
+          name: "Main Circuit",
           plan: [
-            "Run 1 mile",
-            "5 rounds:",
+            "5 rounds total",
+            "10 pull-ups",
             "20 push-ups",
-            "15 squats",
-            "10 pull-ups"
-          ]
-        },
-        {
-          name: "Ruck",
-          plan: [
-            "3–6 miles",
-            "20–40 lb pack"
-          ]
-        },
-        {
-          name: "Long Run",
-          plan: [
-            "3–5 mile steady run"
+            "30 squats",
+            "10 burpees",
+            "30-second sprint",
+            "Rest 1–2 minutes between rounds"
           ]
         }
       ]
     },
 
-    Sunday: {
-      title: "Rest Day",
-      goal: "Full recovery",
+    Saturday: {
+      title: "Long Run + Light Core",
+      goal: "Build endurance base and support 2-mile performance",
+      exercises: [
+        { name: "Easy to Moderate Run", target: "2–4 miles" }
+      ],
+      core: [
+        "Plank — 2 max-time sets",
+        "Dead bug — 2 sets of 20 total"
+      ],
       notes: [
-        "Light walking optional",
-        "Stretching recommended"
+        "Keep the pace controlled",
+        "Finish with light stretching"
       ]
     }
   }
@@ -203,12 +202,8 @@ function renderDay(dayName) {
     sectionCards.push(createSectionCard("Exercises", createExerciseList(day.exercises)));
   }
 
-  if (day.power?.length) {
-    sectionCards.push(createSectionCard("Power", createExerciseList(day.power)));
-  }
-
-  if (day.finisher?.length) {
-    sectionCards.push(createSectionCard("Finisher", createList(day.finisher)));
+  if (day.conditioning?.length) {
+    sectionCards.push(createSectionCard("Conditioning", createList(day.conditioning)));
   }
 
   if (day.core?.length) {
@@ -233,8 +228,9 @@ function renderDay(dayName) {
       <p class="goal">${day.goal}</p>
 
       <div class="badge-row">
-        <span class="badge">Warmup Included</span>
-        <span class="badge">Mobility Included</span>
+        <span class="badge">Bodyweight Only</span>
+        <span class="badge">Pull-Up Bar Ready</span>
+        <span class="badge">ACFT Focused</span>
       </div>
     </section>
 
@@ -268,6 +264,12 @@ function renderApp(selectedDay = dayNames[0]) {
         <h2>${WORKOUT_PLAN.mobilityDaily.title}</h2>
         <p class="goal">${WORKOUT_PLAN.mobilityDaily.goal}</p>
         ${createList(WORKOUT_PLAN.mobilityDaily.items)}
+      </section>
+
+      <section class="card">
+        <h2>${WORKOUT_PLAN.progression.title}</h2>
+        <p class="goal">${WORKOUT_PLAN.progression.goal}</p>
+        ${createList(WORKOUT_PLAN.progression.items)}
       </section>
 
       ${renderDay(selectedDay)}
