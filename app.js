@@ -152,35 +152,173 @@ const WORKOUT_PLAN = {
   }
 };
 
+const STORAGE_KEYS = {
+  progress: "scavTrainingProgress",
+  streak: "scavTrainingStreak",
+  lastCompleteDate: "scavTrainingLastCompleteDate",
+  workoutMode: "scavTrainingWorkoutMode"
+};
+
 const app = document.getElementById("app");
 const dayNames = Object.keys(WORKOUT_PLAN.days);
+const todayName = dayNames[new Date().getDay()];
+let timerInterval = null;
 
-function createList(items) {
+function getTodayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getFriendlyToday() {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric"
+  });
+}
+
+function getProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.progress)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function setProgress(progress) {
+  localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(progress));
+}
+
+function getDayProgress(dayName) {
+  const progress = getProgress();
+  return progress[dayName] || {};
+}
+
+function setDayItemChecked(dayName, itemId, checked) {
+  const progress = getProgress();
+  progress[dayName] = progress[dayName] || {};
+  progress[dayName][itemId] = checked;
+  setProgress(progress);
+}
+
+function clearDayProgress(dayName) {
+  const progress = getProgress();
+  delete progress[dayName];
+  setProgress(progress);
+}
+
+function getWorkoutMode() {
+  return localStorage.getItem(STORAGE_KEYS.workoutMode) === "true";
+}
+
+function setWorkoutMode(value) {
+  localStorage.setItem(STORAGE_KEYS.workoutMode, String(value));
+}
+
+function getStreak() {
+  return parseInt(localStorage.getItem(STORAGE_KEYS.streak) || "0", 10);
+}
+
+function setStreak(value) {
+  localStorage.setItem(STORAGE_KEYS.streak, String(value));
+}
+
+function getLastCompleteDate() {
+  return localStorage.getItem(STORAGE_KEYS.lastCompleteDate) || "";
+}
+
+function setLastCompleteDate(value) {
+  localStorage.setItem(STORAGE_KEYS.lastCompleteDate, value);
+}
+
+function updateHeaderStats() {
+  const todayLabel = document.getElementById("todayLabel");
+  const streakValue = document.getElementById("streakValue");
+
+  if (todayLabel) {
+    todayLabel.textContent = getFriendlyToday();
+  }
+
+  if (streakValue) {
+    const streak = getStreak();
+    streakValue.textContent = `${streak} day${streak === 1 ? "" : "s"}`;
+  }
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function makeItemId(section, index) {
+  return `${section}-${index}`;
+}
+
+function createList(items, dayName, sectionKey) {
+  const dayProgress = getDayProgress(dayName);
+
   return `
     <ul class="clean-list">
-      ${items.map(item => `<li>${item}</li>`).join("")}
+      ${items.map((item, index) => {
+        const itemId = makeItemId(sectionKey, index);
+        const checked = Boolean(dayProgress[itemId]);
+        return `
+          <li class="list-item ${checked ? "completed" : ""}">
+            <label class="check-row">
+              <input
+                class="list-checkbox"
+                type="checkbox"
+                data-day="${escapeHtml(dayName)}"
+                data-item-id="${escapeHtml(itemId)}"
+                ${checked ? "checked" : ""}
+              />
+              <div class="check-content">${escapeHtml(item)}</div>
+            </label>
+          </li>
+        `;
+      }).join("")}
     </ul>
   `;
 }
 
-function createExerciseList(exercises) {
+function createExerciseList(exercises, dayName, sectionKey) {
+  const dayProgress = getDayProgress(dayName);
+
   return `
     <ul class="clean-list">
-      ${exercises.map(ex => `
-        <li>
-          <div class="exercise-name">${ex.name}</div>
-          <div class="exercise-target">${ex.target}</div>
-        </li>
-      `).join("")}
+      ${exercises.map((exercise, index) => {
+        const itemId = makeItemId(sectionKey, index);
+        const checked = Boolean(dayProgress[itemId]);
+        return `
+          <li class="exercise-item ${checked ? "completed" : ""}">
+            <label class="exercise-row">
+              <input
+                class="exercise-checkbox"
+                type="checkbox"
+                data-day="${escapeHtml(dayName)}"
+                data-item-id="${escapeHtml(itemId)}"
+                ${checked ? "checked" : ""}
+              />
+              <div class="exercise-content">
+                <div class="exercise-name">${escapeHtml(exercise.name)}</div>
+                <div class="exercise-target">${escapeHtml(exercise.target)}</div>
+              </div>
+            </label>
+          </li>
+        `;
+      }).join("")}
     </ul>
   `;
 }
 
-function createOptions(options) {
-  return options.map(option => `
+function createOptions(options, dayName, sectionKey) {
+  return options.map((option, optionIndex) => `
     <div class="option-block">
-      <h4>${option.name}</h4>
-      ${createList(option.plan)}
+      <h4>${escapeHtml(option.name)}</h4>
+      ${createList(option.plan, dayName, `${sectionKey}-${optionIndex}`)}
     </div>
   `).join("");
 }
@@ -188,8 +326,116 @@ function createOptions(options) {
 function createSectionCard(title, content) {
   return `
     <section class="section-card">
-      <h3 class="section-title">${title}</h3>
+      <h3 class="section-title">${escapeHtml(title)}</h3>
       ${content}
+    </section>
+  `;
+}
+
+function getDayItemCounts(dayName) {
+  const day = WORKOUT_PLAN.days[dayName];
+  const progress = getDayProgress(dayName);
+
+  const sections = [
+    ["exercises", day.exercises],
+    ["conditioning", day.conditioning],
+    ["core", day.core],
+    ["mobility", day.mobility],
+    ["notes", day.notes]
+  ];
+
+  let total = 0;
+  let completed = 0;
+
+  sections.forEach(([sectionName, items]) => {
+    if (!items?.length) return;
+    items.forEach((_, index) => {
+      total += 1;
+      if (progress[makeItemId(sectionName, index)]) {
+        completed += 1;
+      }
+    });
+  });
+
+  if (day.options?.length) {
+    day.options.forEach((option, optionIndex) => {
+      option.plan.forEach((_, itemIndex) => {
+        total += 1;
+        if (progress[makeItemId(`options-${optionIndex}`, itemIndex)]) {
+          completed += 1;
+        }
+      });
+    });
+  }
+
+  return { total, completed };
+}
+
+function maybeUpdateStreak(dayName) {
+  const { total, completed } = getDayItemCounts(dayName);
+  if (!total || completed !== total) return;
+
+  const today = getTodayISO();
+  const lastDate = getLastCompleteDate();
+
+  if (lastDate === today) return;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayISO = yesterday.toISOString().slice(0, 10);
+
+  if (lastDate === yesterdayISO) {
+    setStreak(getStreak() + 1);
+  } else {
+    setStreak(1);
+  }
+
+  setLastCompleteDate(today);
+  updateHeaderStats();
+}
+
+function createProgressMarkup(dayName) {
+  const { total, completed } = getDayItemCounts(dayName);
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+
+  return `
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Daily completion</span>
+        <span>${completed}/${total} complete</span>
+      </div>
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-fill" style="width: ${percent}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function createTimerCard() {
+  return `
+    <section class="card">
+      <h2>Timer</h2>
+      <p class="goal">Quick presets for planks, rests, sprints, and mobility holds</p>
+
+      <div class="timer-grid">
+        <div id="timerDisplay" class="timer-display">00:30</div>
+
+        <div class="timer-presets">
+          <button class="btn" type="button" data-timer="30">30 sec</button>
+          <button class="btn" type="button" data-timer="45">45 sec</button>
+          <button class="btn" type="button" data-timer="60">60 sec</button>
+          <button class="btn" type="button" data-timer="90">90 sec</button>
+          <button class="btn" type="button" data-timer="120">2 min</button>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-primary" type="button" id="startTimerBtn">Start</button>
+          <button class="btn" type="button" id="pauseTimerBtn">Pause</button>
+          <button class="btn btn-danger" type="button" id="resetTimerBtn">Reset</button>
+        </div>
+
+        <div id="timerStatus" class="timer-status">Ready</div>
+      </div>
     </section>
   `;
 }
@@ -199,39 +445,53 @@ function renderDay(dayName) {
   const sectionCards = [];
 
   if (day.exercises?.length) {
-    sectionCards.push(createSectionCard("Exercises", createExerciseList(day.exercises)));
+    sectionCards.push(
+      createSectionCard("Exercises", createExerciseList(day.exercises, dayName, "exercises"))
+    );
   }
 
   if (day.conditioning?.length) {
-    sectionCards.push(createSectionCard("Conditioning", createList(day.conditioning)));
+    sectionCards.push(
+      createSectionCard("Conditioning", createList(day.conditioning, dayName, "conditioning"))
+    );
   }
 
   if (day.core?.length) {
-    sectionCards.push(createSectionCard("Core", createList(day.core)));
+    sectionCards.push(
+      createSectionCard("Core", createList(day.core, dayName, "core"))
+    );
   }
 
   if (day.mobility?.length) {
-    sectionCards.push(createSectionCard("Mobility", createList(day.mobility)));
+    sectionCards.push(
+      createSectionCard("Mobility", createList(day.mobility, dayName, "mobility"))
+    );
   }
 
   if (day.options?.length) {
-    sectionCards.push(createSectionCard("Options", createOptions(day.options)));
+    sectionCards.push(
+      createSectionCard("Options", createOptions(day.options, dayName, "options"))
+    );
   }
 
   if (day.notes?.length) {
-    sectionCards.push(createSectionCard("Notes", createList(day.notes)));
+    sectionCards.push(
+      createSectionCard("Notes", createList(day.notes, dayName, "notes"))
+    );
   }
 
   return `
     <section class="card">
-      <h2>${dayName} — ${day.title}</h2>
-      <p class="goal">${day.goal}</p>
+      <h2>${escapeHtml(dayName)} — ${escapeHtml(day.title)}</h2>
+      <p class="goal">${escapeHtml(day.goal)}</p>
 
       <div class="badge-row">
         <span class="badge">Bodyweight Only</span>
         <span class="badge">Pull-Up Bar Ready</span>
         <span class="badge">ACFT Focused</span>
       </div>
+
+      ${createProgressMarkup(dayName)}
     </section>
 
     <div class="mini-grid">
@@ -240,46 +500,185 @@ function renderDay(dayName) {
   `;
 }
 
-function renderApp(selectedDay = dayNames[0]) {
+function renderApp(selectedDay = todayName) {
+  const isWorkoutMode = getWorkoutMode();
+  document.body.classList.toggle("workout-mode", isWorkoutMode);
+
   app.innerHTML = `
     <section class="controls">
-      <div class="control-group">
-        <label for="daySelect">Choose a training day</label>
-        <select id="daySelect">
-          ${dayNames.map(day => `
-            <option value="${day}" ${day === selectedDay ? "selected" : ""}>${day}</option>
-          `).join("")}
-        </select>
+      <div class="control-row">
+        <div class="control-group">
+          <label for="daySelect">Choose a training day</label>
+          <select id="daySelect">
+            ${dayNames.map(day => `
+              <option value="${escapeHtml(day)}" ${day === selectedDay ? "selected" : ""}>${escapeHtml(day)}</option>
+            `).join("")}
+          </select>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="todayBtn" type="button">Go to Today</button>
+          <button class="btn" id="toggleWorkoutModeBtn" type="button">
+            ${isWorkoutMode ? "Exit Workout Mode" : "Start Workout Mode"}
+          </button>
+          <button class="btn btn-danger" id="resetDayBtn" type="button">Reset This Day</button>
+        </div>
       </div>
     </section>
 
     <div class="grid">
-      <section class="card">
-        <h2>${WORKOUT_PLAN.warmup.title}</h2>
-        <p class="goal">${WORKOUT_PLAN.warmup.goal}</p>
-        ${createList(WORKOUT_PLAN.warmup.items)}
-      </section>
+      <div class="top-cards mini-grid">
+        <section class="card">
+          <h2>${escapeHtml(WORKOUT_PLAN.warmup.title)}</h2>
+          <p class="goal">${escapeHtml(WORKOUT_PLAN.warmup.goal)}</p>
+          ${createList(WORKOUT_PLAN.warmup.items, selectedDay, "warmup")}
+        </section>
 
-      <section class="card">
-        <h2>${WORKOUT_PLAN.mobilityDaily.title}</h2>
-        <p class="goal">${WORKOUT_PLAN.mobilityDaily.goal}</p>
-        ${createList(WORKOUT_PLAN.mobilityDaily.items)}
-      </section>
+        <section class="card">
+          <h2>${escapeHtml(WORKOUT_PLAN.mobilityDaily.title)}</h2>
+          <p class="goal">${escapeHtml(WORKOUT_PLAN.mobilityDaily.goal)}</p>
+          ${createList(WORKOUT_PLAN.mobilityDaily.items, selectedDay, "mobilityDaily")}
+        </section>
 
-      <section class="card">
-        <h2>${WORKOUT_PLAN.progression.title}</h2>
-        <p class="goal">${WORKOUT_PLAN.progression.goal}</p>
-        ${createList(WORKOUT_PLAN.progression.items)}
-      </section>
+        <section class="card">
+          <h2>${escapeHtml(WORKOUT_PLAN.progression.title)}</h2>
+          <p class="goal">${escapeHtml(WORKOUT_PLAN.progression.goal)}</p>
+          ${createList(WORKOUT_PLAN.progression.items, selectedDay, "progression")}
+        </section>
+      </div>
+
+      ${createTimerCard()}
 
       ${renderDay(selectedDay)}
     </div>
   `;
 
-  const daySelect = document.getElementById("daySelect");
-  daySelect.addEventListener("change", (event) => {
-    renderApp(event.target.value);
-  });
+  wireEvents(selectedDay);
+  updateHeaderStats();
+  resetTimerUi();
 }
 
-renderApp();
+function wireEvents(selectedDay) {
+  const daySelect = document.getElementById("daySelect");
+  const todayBtn = document.getElementById("todayBtn");
+  const toggleWorkoutModeBtn = document.getElementById("toggleWorkoutModeBtn");
+  const resetDayBtn = document.getElementById("resetDayBtn");
+
+  daySelect?.addEventListener("change", (event) => {
+    renderApp(event.target.value);
+  });
+
+  todayBtn?.addEventListener("click", () => {
+    renderApp(todayName);
+  });
+
+  toggleWorkoutModeBtn?.addEventListener("click", () => {
+    setWorkoutMode(!getWorkoutMode());
+    renderApp(selectedDay);
+  });
+
+  resetDayBtn?.addEventListener("click", () => {
+    clearDayProgress(selectedDay);
+    renderApp(selectedDay);
+  });
+
+  document.querySelectorAll('input[type="checkbox"][data-item-id]').forEach((checkbox) => {
+    checkbox.addEventListener("change", (event) => {
+      const target = event.target;
+      const dayName = target.dataset.day;
+      const itemId = target.dataset.itemId;
+      const checked = target.checked;
+
+      setDayItemChecked(dayName, itemId, checked);
+      maybeUpdateStreak(dayName);
+      renderApp(dayName);
+    });
+  });
+
+  document.querySelectorAll("[data-timer]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const seconds = Number(button.dataset.timer);
+      setTimerValue(seconds);
+      setTimerStatus(`Preset set: ${formatTime(seconds)}`);
+    });
+  });
+
+  document.getElementById("startTimerBtn")?.addEventListener("click", startTimer);
+  document.getElementById("pauseTimerBtn")?.addEventListener("click", pauseTimer);
+  document.getElementById("resetTimerBtn")?.addEventListener("click", resetTimerUi);
+}
+
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function getTimerDisplayElement() {
+  return document.getElementById("timerDisplay");
+}
+
+function getTimerStatusElement() {
+  return document.getElementById("timerStatus");
+}
+
+function getTimerValue() {
+  const display = getTimerDisplayElement();
+  if (!display) return 30;
+
+  const [minutes, seconds] = display.textContent.split(":").map(Number);
+  return (minutes * 60) + seconds;
+}
+
+function setTimerValue(seconds) {
+  const display = getTimerDisplayElement();
+  if (display) {
+    display.textContent = formatTime(seconds);
+  }
+}
+
+function setTimerStatus(text) {
+  const status = getTimerStatusElement();
+  if (status) {
+    status.textContent = text;
+  }
+}
+
+function startTimer() {
+  pauseTimer();
+
+  let remaining = getTimerValue();
+  if (remaining <= 0) {
+    remaining = 30;
+    setTimerValue(remaining);
+  }
+
+  setTimerStatus("Running");
+
+  timerInterval = window.setInterval(() => {
+    remaining -= 1;
+    setTimerValue(Math.max(remaining, 0));
+
+    if (remaining <= 0) {
+      pauseTimer();
+      setTimerStatus("Done");
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    setTimerStatus("Paused");
+  }
+}
+
+function resetTimerUi() {
+  pauseTimer();
+  setTimerValue(30);
+  setTimerStatus("Ready");
+}
+
+updateHeaderStats();
+renderApp(todayName);
